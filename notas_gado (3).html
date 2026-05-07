@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Notas Gado">
+<title>Notas de Gado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1a5c3a;
+    --verde-claro: #e8f5ee;
+    --verde-medio: #2d7a52;
+    --azul: #1a3a5c;
+    --azul-claro: #e8f0f5;
+    --terra: #8b5a2b;
+    --bg: #f5f2ee;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: rgba(0,0,0,0.1);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .topo {
+    background: var(--verde);
+    padding: 20px 20px 28px;
+    text-align: center;
+    position: relative;
+  }
+  .topo-logo { font-size: 32px; margin-bottom: 4px; }
+  .topo h1 { color: #fff; font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  .topo p { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 2px; }
+
+  .conteudo { padding: 20px 16px 40px; max-width: 440px; margin: 0 auto; }
+
+  .secao-label {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 10px; margin-top: 20px;
+  }
+  .secao-label:first-child { margin-top: 0; }
+
+  .tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tipo-card {
+    background: var(--card); border-radius: var(--radius);
+    border: 2px solid transparent; padding: 16px 12px;
+    cursor: pointer; text-align: center; transition: all 0.18s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .tipo-card .icone { font-size: 28px; margin-bottom: 6px; }
+  .tipo-card .nome { font-size: 15px; font-weight: 600; color: var(--text); }
+  .tipo-card .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tipo-card.compra.ativo { border-color: var(--azul); background: var(--azul-claro); }
+  .tipo-card.venda.ativo { border-color: var(--verde); background: var(--verde-claro); }
+  .tipo-card.compra.ativo .nome { color: var(--azul); }
+  .tipo-card.venda.ativo .nome { color: var(--verde); }
+
+  .foto-btn {
+    background: var(--card); border-radius: var(--radius);
+    border: 2px dashed var(--border); padding: 28px 20px;
+    cursor: pointer; text-align: center; width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    transition: all 0.18s; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .foto-btn:active { transform: scale(0.98); }
+  .foto-btn .cam-icone { font-size: 36px; }
+  .foto-btn .cam-txt { font-size: 15px; font-weight: 600; color: var(--text); }
+  .foto-btn .cam-sub { font-size: 12px; color: var(--muted); }
+
+  .preview-wrap { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .preview-wrap img { width: 100%; display: block; max-height: 220px; object-fit: cover; }
+  .preview-trocar {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(0,0,0,0.6); color: #fff; border: none;
+    border-radius: 8px; padding: 6px 12px; font-size: 12px;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; font-weight: 500;
+  }
+
+  .btn-ia {
+    width: 100%; padding: 14px; border-radius: var(--radius-sm);
+    border: 2px solid var(--verde); background: transparent;
+    color: var(--verde); font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .btn-ia:active { background: var(--verde-claro); transform: scale(0.98); }
+  .btn-ia:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .campos-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
+  }
+  .campo-item {
+    padding: 13px 16px; border-bottom: 1px solid var(--bg);
+  }
+  .campo-item:last-child { border-bottom: none; }
+  .campo-item label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px; }
+  .campo-item input {
+    width: 100%; border: none; outline: none; font-size: 15px;
+    font-family: 'DM Sans', sans-serif; color: var(--text);
+    background: transparent; padding: 0;
+  }
+  .campo-item input::placeholder { color: #bbb; }
+  .campo-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .campo-row .campo-item:first-child { border-right: 1px solid var(--bg); }
+
+  .btn-enviar {
+    width: 100%; padding: 16px; border-radius: var(--radius);
+    border: none; font-size: 16px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.15s; color: #fff;
+  }
+  .btn-enviar.compra { background: var(--azul); }
+  .btn-enviar.venda { background: var(--verde); }
+  .btn-enviar:active { transform: scale(0.97); filter: brightness(0.92); }
+  .btn-enviar:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .msg {
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 500; display: none;
+    align-items: center; gap: 8px;
+  }
+  .msg.ok { background: var(--verde-claro); color: var(--verde); display: flex; }
+  .msg.err { background: #fde8e8; color: #b91c1c; display: flex; }
+  .msg.load { background: #f3f4f6; color: var(--muted); display: flex; }
+
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.15);
+    border-top-color: currentColor; border-radius: 50%;
+    animation: spin 0.7s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .historico-lista { display: flex; flex-direction: column; gap: 8px; }
+  .hist-card {
+    background: var(--card); border-radius: var(--radius-sm);
+    padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .hist-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .hist-dot.compra { background: var(--azul); }
+  .hist-dot.venda { background: var(--verde); }
+  .hist-info { flex: 1; min-width: 0; }
+  .hist-info .hn { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hist-info .hd { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .hist-val { font-size: 13px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; white-space: nowrap; }
+
+  .empty { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <div class="topo-logo">🐄</div>
+  <h1>Notas de Gado</h1>
+  <p>Registre compras e vendas rapidamente</p>
+</div>
+
+<div class="conteudo">
+
+  <div class="secao-label">Tipo de operação</div>
+  <div class="tipo-grid">
+    <div class="tipo-card compra" onclick="setTipo('compra',this)">
+      <div class="icone">📥</div>
+      <div class="nome">Compra</div>
+      <div class="desc">Entrada de gado</div>
+    </div>
+    <div class="tipo-card venda" onclick="setTipo('venda',this)">
+      <div class="icone">📤</div>
+      <div class="nome">Venda</div>
+      <div class="desc">Saída de gado</div>
+    </div>
+  </div>
+
+  <div class="secao-label">Foto da nota</div>
+  <div id="foto-area">
+    <button class="foto-btn" onclick="document.getElementById('foto-input').click()">
+      <span class="cam-icone">📷</span>
+      <span class="cam-txt">Tirar foto ou escolher arquivo</span>
+      <span class="cam-sub">Foto da nota fiscal ou GTA</span>
+    </button>
+  </div>
+  <input type="file" id="foto-input" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="handleFoto(this)">
+
+  <div id="preview-area" style="display:none; margin-top:0;">
+    <div class="preview-wrap">
+      <img id="foto-preview" alt="Foto da nota">
+      <button class="preview-trocar" onclick="trocarFoto()">Trocar foto</button>
+    </div>
+  </div>
+
+  <div id="area-ia" style="display:none; margin-top:12px;">
+    <button class="btn-ia" id="btn-ia" onclick="processarFoto()">
+      <span>✨</span> Extrair dados com IA
+    </button>
+  </div>
+
+  <div id="msg" class="msg"></div>
+
+  <div id="area-campos" style="display:none;">
+    <div class="secao-label">Dados da nota</div>
+    <div class="campos-card">
+      <div class="campo-item">
+        <label>Emitente / Vendedor</label>
+        <input type="text" id="f-emitente" placeholder="Nome ou razão social">
+      </div>
+      <div class="campo-item">
+        <label>Destinatário / Comprador</label>
+        <input type="text" id="f-destinatario" placeholder="Nome ou razão social">
+      </div>
+      <div class="campo-row">
+        <div class="campo-item">
+          <label>Nº da nota</label>
+          <input type="text" id="f-nf" placeholder="Ex: 3459">
+        </div>
+        <div class="campo-item">
+          <label>Data</label>
+          <input type="date" id="f-data">
+        </div>
+      </div>
+      <div class="campo-row">
+        <div class="campo-item">
+          <label>Cabeças</label>
+          <input type="number" id="f-cabecas" placeholder="Qtd" min="0" inputmode="numeric">
+        </div>
+        <div class="campo-item">
+          <label>Valor total (R$)</label>
+          <input type="number" id="f-valor" placeholder="0,00" step="0.01" min="0" inputmode="decimal">
+        </div>
+      </div>
+      <div class="campo-item">
+        <label>Observações</label>
+        <input type="text" id="f-obs" placeholder="Fazenda, GTA, NF complementar...">
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <button class="btn-enviar" id="btn-enviar" onclick="enviarPlanilha()">
+      <span>📊</span> Enviar para planilha
+    </button>
+  </div>
+
+  <div id="area-historico" style="display:none; margin-top:28px;">
+    <div class="secao-label">Enviadas hoje</div>
+    <div class="historico-lista" id="hist-lista"></div>
+  </div>
+
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvO-mALMOD9FNuWyYxYtruZoa4a3DLpjV5K7fG27XAMrCQdGV1e-9Jx55ZpqmMieIR4A/exec';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+
+let tipoSel = null;
+let fotoBase64 = null;
+let fotoMime = null;
+let historico = [];
+
+function setTipo(tipo, el) {
+  tipoSel = tipo;
+  document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('ativo'));
+  el.classList.add('ativo');
+  const btn = document.getElementById('btn-enviar');
+  btn.className = 'btn-enviar ' + tipo;
+}
+
+function handleFoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    fotoBase64 = e.target.result.split(',')[1];
+    fotoMime = file.type;
+    if (file.type.startsWith('image/')) {
+      document.getElementById('foto-preview').src = e.target.result;
+      document.getElementById('preview-area').style.display = 'block';
+      document.getElementById('foto-area').style.display = 'none';
+    } else {
+      document.getElementById('foto-area').querySelector('.cam-txt').textContent = '📄 ' + file.name;
+    }
+    document.getElementById('area-ia').style.display = 'block';
+    document.getElementById('area-campos').style.display = 'block';
+    document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+    hideMsg();
+  };
+  reader.readAsDataURL(file);
+}
+
+function trocarFoto() {
+  document.getElementById('foto-input').click();
+}
+
+function showMsg(html, tipo) {
+  const el = document.getElementById('msg');
+  el.innerHTML = html;
+  el.className = 'msg ' + tipo;
+  el.style.display = 'flex';
+  el.style.marginTop = '12px';
+  el.style.marginBottom = '12px';
+}
+
+function hideMsg() {
+  const el = document.getElementById('msg');
+  el.style.display = 'none';
+}
+
+async function processarFoto() {
+  if (!fotoBase64) return;
+  const btn = document.getElementById('btn-ia');
+  btn.disabled = true;
+  showMsg('<div class="spinner"></div> Lendo a nota com IA...', 'load');
+
+  try {
+    const isPdf = fotoMime === 'application/pdf';
+    const contentItem = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fotoBase64 } }
+      : { type: 'image', source: { type: 'base64', media_type: fotoMime, data: fotoBase64 } };
+
+    const resp = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            contentItem,
+            { type: 'text', text: 'Extraia os dados desta nota fiscal de gado. Responda APENAS com JSON, sem texto extra:\n{"numero_nf":"","data_emissao":"DD/MM/AAAA","emitente":"","destinatario":"","produto":"","quantidade_cabecas":0,"valor_total":0,"cfop":"","observacoes":""}' }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const text = data.content.map(c => c.text || '').join('');
+    const json = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+    if (json.emitente) document.getElementById('f-emitente').value = json.emitente;
+    if (json.destinatario) document.getElementById('f-destinatario').value = json.destinatario;
+    if (json.numero_nf) document.getElementById('f-nf').value = json.numero_nf;
+    if (json.data_emissao) {
+      const p = json.data_emissao.split('/');
+      if (p.length === 3) document.getElementById('f-data').value = p[2]+'-'+p[1]+'-'+p[0];
+    }
+    if (json.quantidade_cabecas) document.getElementById('f-cabecas').value = json.quantidade_cabecas;
+    if (json.valor_total) document.getElementById('f-valor').value = json.valor_total;
+    if (json.observacoes) document.getElementById('f-obs').value = json.observacoes;
+
+    showMsg('✅ Dados extraídos! Confira e envie.', 'ok');
+  } catch(e) {
+    showMsg('⚠️ Não consegui ler. Preencha manualmente.', 'err');
+  }
+  btn.disabled = false;
+}
+
+async function enviarPlanilha() {
+  if (!tipoSel) { showMsg('⚠️ Selecione Compra ou Venda primeiro.', 'err'); return; }
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  showMsg('<div class="spinner"></div> Enviando para o Google Sheets...', 'load');
+
+  const dataVal = document.getElementById('f-data').value;
+  const dataBR = dataVal ? dataVal.split('-').reverse().join('/') : '';
+  const [d, m, a] = dataBR.split('/');
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const mesLabel = m ? meses[parseInt(m)-1] + '/' + a : '';
+
+  const payload = {
+    tipo: tipoSel,
+    mes: mesLabel,
+    data_emissao: dataBR,
+    numero_nf: document.getElementById('f-nf').value,
+    emitente: document.getElementById('f-emitente').value,
+    destinatario: document.getElementById('f-destinatario').value,
+    produto: 'Bovino',
+    quantidade_cabecas: parseInt(document.getElementById('f-cabecas').value) || 0,
+    valor_total: parseFloat(document.getElementById('f-valor').value) || 0,
+    cfop: '',
+    observacoes: document.getElementById('f-obs').value
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    historico.unshift(payload);
+    renderHistorico();
+    showMsg('✅ Nota enviada com sucesso!', 'ok');
+    limpar();
+  } catch(e) {
+    showMsg('❌ Erro ao enviar. Tente novamente.', 'err');
+  }
+  btn.disabled = false;
+}
+
+function limpar() {
+  fotoBase64 = null; fotoMime = null;
+  document.getElementById('foto-preview').src = '';
+  document.getElementById('preview-area').style.display = 'none';
+  document.getElementById('foto-area').style.display = 'block';
+  document.getElementById('foto-area').querySelector('.cam-txt').textContent = 'Tirar foto ou escolher arquivo';
+  document.getElementById('area-ia').style.display = 'none';
+  document.getElementById('area-campos').style.display = 'none';
+  document.getElementById('foto-input').value = '';
+  ['f-emitente','f-destinatario','f-nf','f-data','f-cabecas','f-valor','f-obs'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderHistorico() {
+  const area = document.getElementById('area-historico');
+  const lista = document.getElementById('hist-lista');
+  area.style.display = 'block';
+  lista.innerHTML = historico.map(h => `
+    <div class="hist-card">
+      <div class="hist-dot ${h.tipo}"></div>
+      <div class="hist-info">
+        <div class="hn">${h.emitente || h.destinatario || 'Sem nome'}</div>
+        <div class="hd">${h.tipo === 'compra' ? 'Compra' : 'Venda'} · ${h.data_emissao} · ${h.quantidade_cabecas} cab.</div>
+      </div>
+      <div class="hist-val">R$${(h.valor_total||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
