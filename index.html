@@ -258,7 +258,7 @@
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvO-mALMOD9FNuWyYxYtruZoa4a3DLpjV5K7fG27XAMrCQdGV1e-9Jx55ZpqmMieIR4A/exec';
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
-
+const ANTHROPIC_KEY = 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
 let tipoSel = null;
 let fotoBase64 = null;
 let fotoMime = null;
@@ -326,7 +326,7 @@ async function processarFoto() {
 
     const resp = await fetch(ANTHROPIC_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -391,7 +391,7 @@ async function enviarPlanilha() {
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify(payload)
     });
 
